@@ -1,0 +1,13 @@
+name = "abc-editor"
+compatibility_date = "2024-11-01"
+compatibility_flags = ["nodejs_compat"]
+pages_build_output_dir = ".vercel/output/static"
+
+[pages_build_config]
+build_command = "pnpm pages:build"
+destination_dir = ".vercel/output/static"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "institute-db"
+database_id = "3d9d8b52-63de-47fa-a8d0-3c1bb11f9058"
