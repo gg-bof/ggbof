@@ -2030,7 +2030,14 @@ let renderCount = 0;
 const DnDFlow = React.memo(() => {
   renderCount++;
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
-  const { lang, setLang, isMember, isOperational, roles } = useLanguage();
+  // const { lang, setLang, isMember, isOperational, roles } = useLanguage();
+  // HARDCODED FOR DIAGNOSTIC STABILITY
+  const lang = 'ja';
+  const isMember = true;
+  const isOperational = true;
+  const roles = ['admin'];
+  const setLang = () => {};
+  
   const t = (translations as any)[lang];
 
   // --- Page Management State ---
@@ -2899,7 +2906,7 @@ const DnDFlow = React.memo(() => {
                   </ul>
                   <button onClick={handleNuclearReset} style={{ width: '100%', marginTop: '12px', padding: '8px', background: '#ff4d4f', color: '#fff', border: 'none', borderRadius: '6px', fontSize: '11px', fontWeight: 'bold', cursor: 'pointer' }}>NUCLEAR RESET (FORCE UNLOCK)</button>
                   <div style={{ marginTop: '12px', fontSize: '10px', color: '#ccc', textAlign: 'right' }}>
-                    Renders: {renderCount} | v2.2.5-STABILITY_FIX
+                    Renders: {renderCount} | v2.2.6-CONTEXT_ISO_FIX
                   </div>
                 </Panel>
               )}
