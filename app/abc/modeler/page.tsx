@@ -2055,6 +2055,11 @@ const DnDFlow = () => {
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [menu, setMenu] = useState<any>(null);
   const [tooltip, setTooltip] = useState<{ content: string, x: number, y: number, title?: string } | null>(null);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   console.log("[ABC] Render State - Nodes:", nodes.length, "Edges:", edges.length);
   if (typeof window !== 'undefined') { (window as any).nodes = nodes; (window as any).edges = edges; }
@@ -2832,7 +2837,10 @@ const DnDFlow = () => {
           </div>
 
           <div style={{ flexGrow: 1, height: '100%', position: 'relative' }}>
-            <ReactFlow
+            {!isMounted ? (
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#999' }}>Loading...</div>
+            ) : (
+              <ReactFlow
               nodes={nodes}
               edges={edges}
               onNodesChange={onNodesChange}
@@ -2877,10 +2885,11 @@ const DnDFlow = () => {
                     <li><span style={{ fontWeight: 600 }}>Context:</span> {t.nodeContext}</li>
                     <li><span style={{ fontWeight: 600 }}>Activity:</span> {t.nodeActivity}</li>
                   </ul>
-                  <div style={{ marginTop: '12px', fontSize: '10px', color: '#ccc', textAlign: 'right' }}>v2.1.2-DEFINITIVE_FIX_FINAL</div>
+                  <div style={{ marginTop: '12px', fontSize: '10px', color: '#ccc', textAlign: 'right' }}>v2.2.0-HYDRATION_FIX</div>
                 </Panel>
               )}
             </ReactFlow>
+            )}
           </div>
         </div>
         <PropertiesPanel
