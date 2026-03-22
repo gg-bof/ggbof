@@ -571,14 +571,14 @@ export const ContextNode = ({ data, selected }: NodeProps) => {
         paddingTop: isRoot ? '24px' : '10px',
       }}>
         {/* The background of the context node should NOT be draggable to allow child interaction */}
-        <div className="nodrag" style={{
+        <div style={{
           position: 'absolute',
           top: 0,
           left: 0,
           right: 0,
           bottom: 0,
           zIndex: -1,
-          pointerEvents: 'auto'
+          pointerEvents: 'none'
         }} />
         {/* Visual drag handle bar at the top */}
         <div className="react-flow__node-drag-handle" style={{ 

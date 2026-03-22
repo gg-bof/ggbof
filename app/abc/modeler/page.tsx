@@ -2061,6 +2061,14 @@ const DnDFlow = () => {
     setIsMounted(true);
   }, []);
 
+  const handleNuclearReset = () => {
+    if (confirm("Reset editor state and force re-mount?")) {
+      setIsMounted(false);
+      localStorage.removeItem('abc_lib_cache');
+      setTimeout(() => setIsMounted(true), 100);
+    }
+  };
+
   console.log("[ABC] Render State - Nodes:", nodes.length, "Edges:", edges.length);
   if (typeof window !== 'undefined') { (window as any).nodes = nodes; (window as any).edges = edges; }
   const [showGuide, setShowGuide] = useState(false);
@@ -2885,7 +2893,8 @@ const DnDFlow = () => {
                     <li><span style={{ fontWeight: 600 }}>Context:</span> {t.nodeContext}</li>
                     <li><span style={{ fontWeight: 600 }}>Activity:</span> {t.nodeActivity}</li>
                   </ul>
-                  <div style={{ marginTop: '12px', fontSize: '10px', color: '#ccc', textAlign: 'right' }}>v2.2.1-FINAL_INTERACTIVE_FIX</div>
+                  <button onClick={handleNuclearReset} style={{ width: '100%', marginTop: '12px', padding: '8px', background: '#ff4d4f', color: '#fff', border: 'none', borderRadius: '6px', fontSize: '11px', fontWeight: 'bold', cursor: 'pointer' }}>NUCLEAR RESET (FORCE UNLOCK)</button>
+                  <div style={{ marginTop: '12px', fontSize: '10px', color: '#ccc', textAlign: 'right' }}>v2.2.2-NUCLEAR_RESET_FIX</div>
                 </Panel>
               )}
             </ReactFlow>
