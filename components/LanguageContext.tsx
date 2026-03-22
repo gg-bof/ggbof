@@ -42,8 +42,16 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
         localStorage.setItem('ggbof-lang', newLang);
     };
 
+    const contextValue = useMemo(() => ({
+        lang,
+        setLang,
+        isMember,
+        isOperational,
+        roles
+    }), [lang, isMember, isOperational, roles]);
+
     return (
-        <LanguageContext.Provider value={{ lang, setLang, isMember, isOperational, roles }}>
+        <LanguageContext.Provider value={contextValue}>
             {children}
         </LanguageContext.Provider>
     );
