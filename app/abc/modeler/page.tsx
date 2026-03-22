@@ -2838,9 +2838,10 @@ const DnDFlow = () => {
 
           <div style={{ flexGrow: 1, height: '100%', position: 'relative' }}>
             {!isMounted ? (
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#999' }}>Loading...</div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#999' }}>Loading Modeler...</div>
             ) : (
               <ReactFlow
+                key="main-flow-mounted"
               nodes={nodes}
               edges={edges}
               onNodesChange={onNodesChange}
@@ -2868,7 +2869,6 @@ const DnDFlow = () => {
               nodesFocusable={true}
               edgesFocusable={true}
               selectNodesOnDrag={false}
-              key="main-flow"
             >
               <Controls showInteractive={false} />
               <Background variant={'dots' as any} gap={20} size={1} color="#e0e0e0" />
@@ -2885,7 +2885,7 @@ const DnDFlow = () => {
                     <li><span style={{ fontWeight: 600 }}>Context:</span> {t.nodeContext}</li>
                     <li><span style={{ fontWeight: 600 }}>Activity:</span> {t.nodeActivity}</li>
                   </ul>
-                  <div style={{ marginTop: '12px', fontSize: '10px', color: '#ccc', textAlign: 'right' }}>v2.2.0-HYDRATION_FIX</div>
+                  <div style={{ marginTop: '12px', fontSize: '10px', color: '#ccc', textAlign: 'right' }}>v2.2.1-FINAL_INTERACTIVE_FIX</div>
                 </Panel>
               )}
             </ReactFlow>

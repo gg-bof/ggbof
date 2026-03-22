@@ -138,15 +138,17 @@ export const CommentNode = ({ data, selected }: NodeProps) => {
         wordBreak: 'break-word',
         textAlign: 'left',
         position: 'relative',
-        fontStyle: 'italic'
+        fontStyle: 'italic',
+        pointerEvents: 'auto'
       }}>
+        <div className="react-flow__node-drag-handle" style={{ position: 'absolute', inset: 0, zIndex: 0 }} />
         {/* Input handles for comments - allows them to be targets */}
-        <Handle type="target" position={Position.Left} style={{ left: '-4px', background: '#9c27b0', border: '1px solid #fff', zIndex: 10 }} />
-        <Handle type="target" position={Position.Top} style={{ top: '-4px', left: '50%', transform: 'translateX(-50%)', background: '#9c27b0', border: '1px solid #fff', zIndex: 10 }} />
+        <Handle type="target" position={Position.Left} style={{ left: '-4px', background: '#9c27b0', border: '1px solid #fff', zIndex: 1000, pointerEvents: 'auto' }} />
+        <Handle type="target" position={Position.Top} style={{ top: '-4px', left: '50%', transform: 'translateX(-50%)', background: '#9c27b0', border: '1px solid #fff', zIndex: 1000, pointerEvents: 'auto' }} />
         
         {/* Output handles for comments - allows them to be sources */}
-        <Handle type="source" position={Position.Right} style={{ right: '-4px', background: '#9c27b0', border: '1px solid #fff', zIndex: 10 }} />
-        <Handle type="source" position={Position.Bottom} style={{ bottom: '-4px', left: '50%', transform: 'translateX(-50%)', background: '#9c27b0', border: '1px solid #fff', zIndex: 10 }} />
+        <Handle type="source" position={Position.Right} style={{ right: '-4px', background: '#9c27b0', border: '1px solid #fff', zIndex: 1000, pointerEvents: 'auto' }} />
+        <Handle type="source" position={Position.Bottom} style={{ bottom: '-4px', left: '50%', transform: 'translateX(-50%)', background: '#9c27b0', border: '1px solid #fff', zIndex: 1000, pointerEvents: 'auto' }} />
 
         {data.label}
       </div>
@@ -492,7 +494,7 @@ export const ArtifactNode = ({ data, selected }: NodeProps) => {
   return (
     <>
       <NodeResizer minWidth={NODE_WIDTH} minHeight={NODE_HEIGHT} isVisible={selected} lineClassName="border-blue-400" handleClassName="bg-white border-blue-400" />
-      <div style={{ ...nodeStyle, border: 'none', background: 'transparent', boxShadow: 'none', overflow: 'visible' }}>
+      <div className="react-flow__node-drag-handle" style={{ ...nodeStyle, border: 'none', background: 'transparent', boxShadow: 'none', overflow: 'visible', pointerEvents: 'auto' }}>
         <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none" style={{ position: 'absolute', top: 0, left: 0, zIndex: -1 }}>
           <polygon
             points="10,2 90,2 98,15 98,85 90,98 10,98 2,85 2,15"
@@ -542,14 +544,14 @@ export const ArtifactNode = ({ data, selected }: NodeProps) => {
           </div>
         </div>
 
-        <Handle type="target" position={Position.Left} style={{ background: '#2196f3', left: '-2px' }} />
+        <Handle type="target" position={Position.Left} style={{ background: '#2196f3', left: '-2px', zIndex: 1000, pointerEvents: 'auto' }} />
         {data.notes && !(data.lockNotes && !isMember && !isOperational) && (
-          <div style={{ position: 'absolute', bottom: '10px', right: '20%', fontSize: '12px', color: '#1a192b', zIndex: 1 }}>📝</div>
+          <div style={{ position: 'absolute', bottom: '10px', right: '20%', fontSize: '12px', color: '#1a192b', zIndex: 1, pointerEvents: 'none' }}>📝</div>
         )}
-        <Handle type="source" position={Position.Right} style={{ background: '#2196f3', right: '-2px' }} />
+        <Handle type="source" position={Position.Right} style={{ background: '#2196f3', right: '-2px', zIndex: 1000, pointerEvents: 'auto' }} />
 
         {/* Asset Source (Top) for IDEF0 Mechanism */}
-        <Handle type="source" position={Position.Top} id="asset-out" style={{ background: '#ff9800', top: '-2px' }} />
+        <Handle type="source" position={Position.Top} id="asset-out" style={{ background: '#ff9800', top: '-2px', zIndex: 1000, pointerEvents: 'auto' }} />
       </div>
     </>
   );
@@ -668,14 +670,15 @@ export const GateNode = ({ data, selected }: NodeProps) => {
   return (
     <>
       <NodeResizer minWidth={60} minHeight={60} isVisible={selected} lineClassName="border-blue-400" handleClassName="bg-white border-blue-400" />
-      <div style={{
+      <div className="react-flow__node-drag-handle" style={{
         position: 'relative',
         width: '80px',
         height: '80px',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        overflow: 'visible'
+        overflow: 'visible',
+        pointerEvents: 'auto'
       }}>
         <svg width="80" height="80" style={{ position: 'absolute', top: 0, left: 0, overflow: 'visible', zIndex: -1 }}>
           <polygon
