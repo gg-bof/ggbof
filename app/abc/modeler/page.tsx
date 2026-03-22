@@ -2025,7 +2025,10 @@ const INITIAL_ROOT_NODE: Node = {
 
 const INITIAL_EDGES: Edge[] = [];
 
-const DnDFlow = () => {
+let renderCount = 0;
+
+const DnDFlow = React.memo(() => {
+  renderCount++;
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const { lang, setLang, isMember, isOperational, roles } = useLanguage();
   const t = (translations as any)[lang];
@@ -2062,7 +2065,8 @@ const DnDFlow = () => {
   }, []);
 
   const handleNuclearReset = () => {
-    if (confirm("Reset editor state and force re-mount?")) {
+    // Use window.confirm for better scope clarity
+    if (typeof window !== 'undefined' && window.confirm("Reset editor state and force re-mount?")) {
       setIsMounted(false);
       localStorage.removeItem('abc_lib_cache');
       setTimeout(() => setIsMounted(true), 100);
@@ -2894,7 +2898,9 @@ const DnDFlow = () => {
                     <li><span style={{ fontWeight: 600 }}>Activity:</span> {t.nodeActivity}</li>
                   </ul>
                   <button onClick={handleNuclearReset} style={{ width: '100%', marginTop: '12px', padding: '8px', background: '#ff4d4f', color: '#fff', border: 'none', borderRadius: '6px', fontSize: '11px', fontWeight: 'bold', cursor: 'pointer' }}>NUCLEAR RESET (FORCE UNLOCK)</button>
-                  <div style={{ marginTop: '12px', fontSize: '10px', color: '#ccc', textAlign: 'right' }}>v2.2.3-STABLE_REF_FIX</div>
+                  <div style={{ marginTop: '12px', fontSize: '10px', color: '#ccc', textAlign: 'right' }}>
+                    Renders: {renderCount} | v2.2.5-STABILITY_FIX
+                  </div>
                 </Panel>
               )}
             </ReactFlow>
@@ -2981,7 +2987,7 @@ const DnDFlow = () => {
       />
     </div>
   );
-};
+});
 
 export default function ABCApp() {
   return (
