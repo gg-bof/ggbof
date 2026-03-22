@@ -2894,7 +2894,7 @@ const DnDFlow = () => {
                     <li><span style={{ fontWeight: 600 }}>Activity:</span> {t.nodeActivity}</li>
                   </ul>
                   <button onClick={handleNuclearReset} style={{ width: '100%', marginTop: '12px', padding: '8px', background: '#ff4d4f', color: '#fff', border: 'none', borderRadius: '6px', fontSize: '11px', fontWeight: 'bold', cursor: 'pointer' }}>NUCLEAR RESET (FORCE UNLOCK)</button>
-                  <div style={{ marginTop: '12px', fontSize: '10px', color: '#ccc', textAlign: 'right' }}>v2.2.2-NUCLEAR_RESET_FIX</div>
+                  <div style={{ marginTop: '12px', fontSize: '10px', color: '#ccc', textAlign: 'right' }}>v2.2.3-STABLE_REF_FIX</div>
                 </Panel>
               )}
             </ReactFlow>
