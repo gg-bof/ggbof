@@ -13,9 +13,12 @@ export async function GET(request: Request) {
         const allComponents = await db.select().from(components);
 
         return NextResponse.json(allComponents.map(comp => {
+            const parsedData = JSON.parse(comp.data);
             const result: any = {
                 ...comp,
-                data: metadataOnly ? null : JSON.parse(comp.data)
+                data: metadataOnly ? null : parsedData,
+                authorName: parsedData.authorName || null,
+                authorAvatar: parsedData.authorAvatar || null
             };
             if (metadataOnly) delete result.data;
             return result;
@@ -29,9 +32,16 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
     try {
         const body = await request.json() as any;
-        const { id, name, description, type, isPrivate, thumbnail, data } = body;
+        const { id, name, description, type, isPrivate, thumbnail, data, authorName, authorAvatar } = body;
 
         const db = getDb((process.env as any).DB);
+        
+        // Ensure author info is preserved in the data blob
+        const richData = {
+            ...(typeof data === 'string' ? JSON.parse(data) : data),
+            authorName,
+            authorAvatar
+        };
 
         await db.insert(components).values({
             id,
@@ -40,7 +50,7 @@ export async function POST(request: Request) {
             type,
             isPrivate,
             thumbnail,
-            data: JSON.stringify(data),
+            data: JSON.stringify(richData),
             createdAt: new Date(),
             updatedAt: new Date(),
         }).onConflictDoUpdate({
@@ -51,7 +61,7 @@ export async function POST(request: Request) {
                 type,
                 isPrivate,
                 thumbnail,
-                data: JSON.stringify(data),
+                data: JSON.stringify(richData),
                 updatedAt: new Date(),
             }
         });

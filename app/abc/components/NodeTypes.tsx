@@ -48,6 +48,37 @@ export const NodeIcon = ({ iconName, color = '#666', size = 24 }: { iconName?: s
   return <Icon size={size} color={color} style={{ flexShrink: 0 }} />;
 };
 
+export const ValidationWarning = ({ title }: { title?: string }) => (
+  <div style={{
+    position: 'absolute',
+    top: '-8px',
+    right: '-8px',
+    background: '#ff4d4f',
+    color: '#fff',
+    width: '20px',
+    height: '20px',
+    borderRadius: '50%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: '12px',
+    fontWeight: 'bold',
+    boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+    zIndex: 100,
+    cursor: 'help',
+    animation: 'pulse 2s infinite'
+  }} title={title || 'Documentation missing'}>
+    ⚠️
+    <style>{`
+      @keyframes pulse {
+        0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 77, 79, 0.7); }
+        70% { transform: scale(1.1); box-shadow: 0 0 0 10px rgba(255, 77, 79, 0); }
+        100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 77, 79, 0); }
+      }
+    `}</style>
+  </div>
+);
+
 export const nodeStyle: React.CSSProperties = {
   width: '100%',
   height: '100%',
@@ -177,7 +208,7 @@ export const CriterionHandle = ({ type, position, id, index, total, color }: { t
         position={position}
         id={id}
         style={{
-          background: color || (isTarget ? '#2196f3' : '#ff4d4f'),
+          background: color || (isTarget ? '#3b82f6' : '#f43f5e'),
           border: 'none',
           width: '12px',
           height: '12px',
@@ -203,7 +234,7 @@ export const CriterionHandle = ({ type, position, id, index, total, color }: { t
           position={position}
           id={id}
           style={{
-            background: color || '#4caf50',
+            background: color || '#10b981',
             border: 'none',
             width: '12px',
             height: '12px',
@@ -224,7 +255,7 @@ export const CriterionHandle = ({ type, position, id, index, total, color }: { t
           position={position}
           id={id}
           style={{
-            background: color || '#2196f3',
+            background: color || '#3b82f6',
             border: 'none',
             width: '12px',
             height: '12px',
@@ -310,11 +341,17 @@ export const CriterionHandle = ({ type, position, id, index, total, color }: { t
 };
 
 export const ActivityNode = ({ data, selected }: NodeProps) => {
-  const inputs = data.inputs || 1;
-  const outputs = data.outputs || 1;
-  const constraints = data.constraints || 1;
-  const assets = data.assets || 1;
+  const inputs = data.inputs !== undefined ? data.inputs : 1;
+  const outputs = data.outputs !== undefined ? data.outputs : 1;
+  const constraints = data.constraints !== undefined ? data.constraints : 1;
+  const assets = data.assets !== undefined ? data.assets : 1;
   const { isMember, isOperational } = useLanguage();
+  const isDocumented = !!data.notes;
+  const connectedHandleIds = data.validation?.connectedHandleIds || [];
+  
+  // Check if any connected handle is missing documentation
+  const hasIncompleteHandles = connectedHandleIds.some((hid: string) => !data.handleData?.[hid]?.description);
+  const showWarning = !isDocumented || hasIncompleteHandles;
 
   return (
     <>
@@ -329,6 +366,7 @@ export const ActivityNode = ({ data, selected }: NodeProps) => {
         overflow: 'visible',
         pointerEvents: 'auto'
       }}>
+        {showWarning && <ValidationWarning title={!isDocumented ? "Node documentation missing" : "Handle documentation missing"} />}
         {data.bgImage && (
           <div style={{
             position: 'absolute',
@@ -345,9 +383,14 @@ export const ActivityNode = ({ data, selected }: NodeProps) => {
           const step = NODE_WIDTH / (constraints + 1);
           const left = `${step * (i + 1)}px`;
           const handle = data.handleData?.[`constraint-${i}`];
+          const isConnected = connectedHandleIds.includes(`constraint-${i}`);
+          const isHandleDocumented = !!handle?.description;
           return (
             <React.Fragment key={`constraint-group-${i}`}>
               <CriterionHandle type="target" position={Position.Top} id={`constraint-${i}`} index={i} total={constraints} color="#4caf50" />
+              {isConnected && !isHandleDocumented && (
+                <div style={{ position: 'absolute', top: '-15px', left: '50%', transform: 'translateX(-50%)', fontSize: '10px', color: '#ff4d4f', zIndex: 100 }}>⚠️</div>
+              )}
               {handle?.name && (
                 <div style={{
                   position: 'absolute',
@@ -375,9 +418,14 @@ export const ActivityNode = ({ data, selected }: NodeProps) => {
           const step = NODE_WIDTH / (assets + 1);
           const left = `${step * (i + 1)}px`;
           const handle = data.handleData?.[`asset-${i}`];
+          const isConnected = connectedHandleIds.includes(`asset-${i}`);
+          const isHandleDocumented = !!handle?.description;
           return (
             <React.Fragment key={`asset-group-${i}`}>
               <CriterionHandle type="target" position={Position.Bottom} id={`asset-${i}`} index={i} total={assets} color="#ff9800" />
+              {isConnected && !isHandleDocumented && (
+                <div style={{ position: 'absolute', bottom: '-15px', left: '50%', transform: 'translateX(-50%)', fontSize: '10px', color: '#ff4d4f', zIndex: 100 }}>⚠️</div>
+              )}
               {handle?.name && (
                 <div style={{
                   position: 'absolute',
@@ -404,9 +452,14 @@ export const ActivityNode = ({ data, selected }: NodeProps) => {
           const step = NODE_HEIGHT / (inputs + 1);
           const top = step * (i + 1);
           const handle = data.handleData?.[`in-${i}`];
+          const isConnected = connectedHandleIds.includes(`in-${i}`);
+          const isHandleDocumented = !!handle?.description;
           return (
             <React.Fragment key={`in-group-${i}`}>
               <CriterionHandle type="target" position={Position.Left} id={`in-${i}`} index={i} total={inputs} />
+              {isConnected && !isHandleDocumented && (
+                <div style={{ position: 'absolute', top: '50%', left: '-15px', transform: 'translateY(-50%)', fontSize: '10px', color: '#ff4d4f', zIndex: 100 }}>⚠️</div>
+              )}
               {handle?.name && (
                 <div style={{
                   position: 'absolute',
@@ -438,13 +491,39 @@ export const ActivityNode = ({ data, selected }: NodeProps) => {
             backdropFilter: data.bgImage ? 'blur(4px)' : 'none',
             padding: data.bgImage ? '6px 12px' : '0',
             borderRadius: '8px',
-            boxShadow: data.bgImage ? '0 2px 10px rgba(0,0,0,0.1)' : 'none'
+            boxShadow: data.bgImage ? '0 2px 10px rgba(0,0,0,0.1)' : 'none',
+            position: 'relative',
+            minWidth: '60px'
           }}>
-            <NodeIcon iconName={data.icon} color="#2196f3" size={24} />
+            {/* Corner Icon */}
+            {data.icon && data.iconPosition && data.iconPosition !== 'center' && (
+              <div style={{
+                position: 'absolute',
+                top: data.iconPosition.includes('top') ? '-5px' : 'auto',
+                bottom: data.iconPosition.includes('bottom') ? '-5px' : 'auto',
+                left: data.iconPosition.includes('left') ? '-5px' : 'auto',
+                right: data.iconPosition.includes('right') ? '-5px' : 'auto',
+                background: '#fff',
+                padding: '2px',
+                borderRadius: '4px',
+                border: '1px solid #e2e8f0',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+                zIndex: 20
+              }}>
+                <NodeIcon iconName={data.icon} color="#4f46e5" size={16} />
+              </div>
+            )}
+            
+            {/* Center Icon (Fallback/Standard) */}
+            {(!data.iconPosition || data.iconPosition === 'center') && (
+              <NodeIcon iconName={data.icon} color="#2196f3" size={24} />
+            )}
+            
             <div style={{
               fontWeight: 'bold',
               fontSize: '14px',
               textAlign: 'center',
+              color: '#1a192b'
             }}>
               {data.label}
             </div>
@@ -459,9 +538,14 @@ export const ActivityNode = ({ data, selected }: NodeProps) => {
           const step = NODE_HEIGHT / (outputs + 1);
           const top = step * (i + 1);
           const handle = data.handleData?.[`out-${i}`];
+          const isConnected = connectedHandleIds.includes(`out-${i}`);
+          const isHandleDocumented = !!handle?.description;
           return (
             <React.Fragment key={`out-group-${i}`}>
               <CriterionHandle type="source" position={Position.Right} id={`out-${i}`} index={i} total={outputs} />
+              {isConnected && !isHandleDocumented && (
+                <div style={{ position: 'absolute', top: '50%', right: '-15px', transform: 'translateY(-50%)', fontSize: '10px', color: '#ff4d4f', zIndex: 100 }}>⚠️</div>
+              )}
               {handle?.name && (
                 <div style={{
                   position: 'absolute',
@@ -491,10 +575,13 @@ export const ActivityNode = ({ data, selected }: NodeProps) => {
 
 export const ArtifactNode = ({ data, selected }: NodeProps) => {
   const { isMember, isOperational } = useLanguage();
+  const isDocumented = !!data.notes;
+  const showWarning = !isDocumented && !data.isRoot; // Don't warn on internal context usage if it's just a structural element, but Artifacts should be documented
   return (
     <>
       <NodeResizer minWidth={NODE_WIDTH} minHeight={NODE_HEIGHT} isVisible={selected} lineClassName="border-blue-400" handleClassName="bg-white border-blue-400" />
       <div className="react-flow__node-drag-handle" style={{ ...nodeStyle, border: 'none', background: 'transparent', boxShadow: 'none', overflow: 'visible', pointerEvents: 'auto' }}>
+        {showWarning && <ValidationWarning title="Artifact documentation missing" />}
         <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none" style={{ position: 'absolute', top: 0, left: 0, zIndex: -1 }}>
           <polygon
             points="10,2 90,2 98,15 98,85 90,98 10,98 2,85 2,15"
@@ -560,6 +647,11 @@ export const ArtifactNode = ({ data, selected }: NodeProps) => {
 export const ContextNode = ({ data, selected }: NodeProps) => {
   const isRoot = data.isRoot;
   const { lang, isMember, isOperational } = useLanguage();
+  const isDocumented = !!data.notes;
+  const showWarning = !isDocumented && !isRoot; // Root context should be named after model, but nodes inside it need notes. Actually user said *all* nodes should have notes.
+  // Wait, user said "すべてのノード ... すべてノートを記載すること". So even root context?
+  // User: "すべてのノード ... は、すべてノートを記載すること"
+  const finalWarning = !isDocumented;
   return (
     <>
       <NodeResizer minWidth={NODE_WIDTH} minHeight={NODE_HEIGHT} isVisible={selected} lineClassName="border-blue-400" handleClassName="bg-white border-blue-400" />
@@ -570,6 +662,7 @@ export const ContextNode = ({ data, selected }: NodeProps) => {
         boxShadow: isRoot ? 'none' : nodeStyle.boxShadow,
         paddingTop: isRoot ? '24px' : '10px',
       }}>
+        {finalWarning && <ValidationWarning title="Context documentation missing" />}
         {/* The background of the context node should NOT be draggable to allow child interaction */}
         <div style={{
           position: 'absolute',
@@ -601,12 +694,12 @@ export const ContextNode = ({ data, selected }: NodeProps) => {
           <GripVertical size={14} color="#03a9f4" style={{ opacity: isRoot ? 0.3 : 0.5 }} />
         </div>
         <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none" style={{ position: 'absolute', top: 0, left: 0, zIndex: -1, pointerEvents: 'none' }}>
-          <polygon
-            points="10,2 90,2 98,15 98,85 90,98 10,98 2,85 2,15"
-            fill={data.bgImage ? 'transparent' : (isRoot ? 'transparent' : (data.color || 'rgba(227, 242, 253, 0.3)'))}
-            stroke={isRoot ? '#94a3b8' : '#03a9f4'}
-            strokeWidth={isRoot ? '2' : '3'}
-            strokeDasharray={isRoot ? '10,5' : '6,4'}
+          <rect
+            x="2" y="2" width="96" height="96" rx="8" ry="8"
+            fill={data.bgImage ? 'transparent' : (isRoot ? 'transparent' : (data.color || 'rgba(239, 246, 255, 0.4)'))}
+            stroke={isRoot ? '#cbd5e1' : '#3b82f6'}
+            strokeWidth={isRoot ? '2' : '2'}
+            strokeDasharray={isRoot ? '8,4' : 'none'}
             vectorEffect="non-scaling-stroke"
           />
         </svg>
@@ -730,11 +823,33 @@ export const GateNode = ({ data, selected }: NodeProps) => {
           <div style={{ position: 'absolute', bottom: '5px', right: '5px', fontSize: '10px', color: '#1a192b', zIndex: 1 }}>📝</div>
         )}
 
-        {/* Handles aligned to the diamond's points */}
-        <Handle type="target" position={Position.Left} style={{ left: '-4px', top: '40px', background: '#2196f3', border: '1px solid #fff', zIndex: 10, pointerEvents: 'auto' }} />
-        <Handle type="source" position={Position.Right} style={{ right: '-4px', top: '40px', background: '#ff4d4f', border: '1px solid #fff', zIndex: 10, pointerEvents: 'auto' }} />
-        <Handle type="target" position={Position.Top} id="top-in" style={{ top: '-4px', left: '40px', background: '#2196f3', border: '1px solid #fff', zIndex: 10, pointerEvents: 'auto' }} />
-        <Handle type="source" position={Position.Bottom} id="bottom-out" style={{ bottom: '-4px', left: '40px', background: '#ff4d4f', border: '1px solid #fff', zIndex: 10, pointerEvents: 'auto' }} />
+        {/* Handles aligned to the diamond's points with labels */}
+        {/* Input (Left) - in-0 */}
+        <Handle type="target" position={Position.Left} id="in-0" style={{ left: '-4px', top: '40px', background: '#3b82f6', border: '1px solid #fff', zIndex: 10, pointerEvents: 'auto' }} />
+        {data.handleData?.['in-0']?.name && (
+          <div style={{ position: 'absolute', top: '40px', left: '10px', transform: 'translateY(-50%)', fontSize: '9px', color: '#3b82f6', fontWeight: 'bold', pointerEvents: 'none' }}>
+            {data.handleData['in-0'].name}
+          </div>
+        )}
+
+        {/* Output 1 (Right) - out-0 */}
+        <Handle type="source" position={Position.Right} id="out-0" style={{ right: '-4px', top: '40px', background: '#f43f5e', border: '1px solid #fff', zIndex: 10, pointerEvents: 'auto' }} />
+        {data.handleData?.['out-0']?.name && (
+          <div style={{ position: 'absolute', top: '40px', right: '10px', transform: 'translateY(-50%)', fontSize: '9px', color: '#f43f5e', fontWeight: 'bold', pointerEvents: 'none', textAlign: 'right' }}>
+            {data.handleData['out-0'].name}
+          </div>
+        )}
+
+        {/* Input/Alternative (Top) - in-1 or top-in */}
+        <Handle type="target" position={Position.Top} id="in-1" style={{ top: '-4px', left: '40px', background: '#10b981', border: '1px solid #fff', zIndex: 10, pointerEvents: 'auto' }} />
+
+        {/* Output 2 (Bottom) - out-1 */}
+        <Handle type="source" position={Position.Bottom} id="out-1" style={{ bottom: '-4px', left: '40px', background: '#f43f5e', border: '1px solid #fff', zIndex: 10, pointerEvents: 'auto' }} />
+        {data.handleData?.['out-1']?.name && (
+          <div style={{ position: 'absolute', bottom: '10px', left: '40px', transform: 'translateX(-50%)', fontSize: '9px', color: '#f43f5e', fontWeight: 'bold', pointerEvents: 'none' }}>
+            {data.handleData['out-1'].name}
+          </div>
+        )}
       </div>
     </>
   );
