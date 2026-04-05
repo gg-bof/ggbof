@@ -21,6 +21,7 @@ import ReactFlow, {
   NodeProps,
   NodeResizer,
   MarkerType,
+  ConnectionMode,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import {
@@ -314,7 +315,7 @@ const ComponentThumbnail = ({ comp }: { comp: any }) => {
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
-              overflow: 'visible', // Allow handles to bleed out
+              overflow: 'visible',
               boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
               zIndex: type === 'context' ? 1 : 2
             }}>
@@ -355,25 +356,20 @@ const ComponentThumbnail = ({ comp }: { comp: any }) => {
                 )}
               </div>
               
-              {/* Dynamic Handles (Accuracy) */}
               {scale > 0.3 && (
                 <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
-                  {/* Inputs (Left) */}
                   {Array.from({ length: data.inputs || (type === 'activity' ? 1 : 0) }).map((_, i, arr) => {
                     const top = (h / (arr.length + 1)) * (i + 1);
                     return <div key={`in-${i}`} style={{ position: 'absolute', left: '-2px', top, transform: 'translateY(-50%)', width: '4px', height: '4px', background: '#3b82f6', borderRadius: '50%', border: '1px solid #fff' }} />;
                   })}
-                  {/* Outputs (Right) */}
                   {Array.from({ length: data.outputs || (type === 'activity' ? 1 : 0) }).map((_, i, arr) => {
                     const top = (h / (arr.length + 1)) * (i + 1);
                     return <div key={`out-${i}`} style={{ position: 'absolute', right: '-2px', top, transform: 'translateY(-50%)', width: '4px', height: '4px', background: '#f43f5e', borderRadius: '0', clipPath: 'polygon(0% 0%, 100% 50%, 0% 100%)', border: 'none' }} />;
                   })}
-                  {/* Constraints (Top) */}
                   {Array.from({ length: data.constraints || 0 }).map((_, i, arr) => {
                     const left = (w / (arr.length + 1)) * (i + 1);
                     return <div key={`con-${i}`} style={{ position: 'absolute', top: '-2px', left, transform: 'translateX(-50%)', width: '4px', height: '4px', background: '#10b981', borderRadius: '0', clipPath: 'polygon(50% 0%, 0% 100%, 100% 100%)' }} />;
                   })}
-                  {/* Assets (Bottom) */}
                   {Array.from({ length: data.assets || 0 }).map((_, i, arr) => {
                     const left = (w / (arr.length + 1)) * (i + 1);
                     return <div key={`ast-${i}`} style={{ position: 'absolute', bottom: '-2px', left, transform: 'translateX(-50%)', width: '4px', height: '4px', background: '#f59e0b', borderRadius: '0', clipPath: 'polygon(0% 0%, 100% 0%, 50% 100%)' }} />;
@@ -779,26 +775,20 @@ const Sidebar = React.memo(({ onImport, onExport, onNew, onExportImage, onDelete
       <div style={{ marginBottom: '30px' }}>
         <div style={{ fontSize: '11px', fontWeight: 'bold', color: '#8c8c8c', marginBottom: '15px' }}>{t.sidebarNodes}</div>
         
-        {/* Activity */}
         <div 
           style={nodeItemStyle} draggable onDragStart={(e) => onDragStart(e, 'activity')}
           onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.borderColor = '#1a192b'; }}
           onMouseLeave={(e) => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.borderColor = '#e0e0e0'; }}
         >
           <div style={{ width: '64px', height: '44px', border: '2.5px solid #1a192b', borderRadius: '6px', marginBottom: '8px', position: 'relative' }}>
-             {/* Input (Left) */}
              <div style={{ position: 'absolute', top: '50%', left: '-6px', transform: 'translateY(-50%)', width: '10px', height: '10px', background: '#2196f3', borderRadius: '2px' }} />
-             {/* Output (Right) */}
              <div style={{ position: 'absolute', top: '50%', right: '-6px', transform: 'translateY(-50%)', width: '10px', height: '10px', background: '#ff4d4f', clipPath: 'polygon(0% 0%, 100% 50%, 0% 100%)' }} />
-             {/* Constraint (Top) */}
              <div style={{ position: 'absolute', top: '-6px', left: '50%', transform: 'translateX(-50%)', width: '10px', height: '10px', background: '#10b981', clipPath: 'polygon(50% 0%, 0% 100%, 100% 100%)' }} />
-             {/* Asset (Bottom) */}
              <div style={{ position: 'absolute', bottom: '-6px', left: '50%', transform: 'translateX(-50%)', width: '10px', height: '10px', background: '#f59e0b', clipPath: 'polygon(0% 0%, 100% 0%, 50% 100%)' }} />
           </div>
           {t.nodeActivity}
         </div>
 
-        {/* Artifact */}
         <div 
           style={nodeItemStyle} draggable onDragStart={(e) => onDragStart(e, 'artifact')}
           onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.borderColor = '#2196f3'; }}
@@ -808,7 +798,6 @@ const Sidebar = React.memo(({ onImport, onExport, onNew, onExportImage, onDelete
           {t.nodeArtifact}
         </div>
 
-        {/* Context */}
         <div 
           style={nodeItemStyle} draggable onDragStart={(e) => onDragStart(e, 'context')}
           onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.borderColor = '#03a9f4'; }}
@@ -818,7 +807,6 @@ const Sidebar = React.memo(({ onImport, onExport, onNew, onExportImage, onDelete
           {t.nodeContext}
         </div>
 
-        {/* Gate */}
         <div 
           style={nodeItemStyle} draggable onDragStart={(e) => onDragStart(e, 'gate')}
           onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.borderColor = '#1a192b'; }}
@@ -830,7 +818,6 @@ const Sidebar = React.memo(({ onImport, onExport, onNew, onExportImage, onDelete
           {t.nodeGate}
         </div>
 
-        {/* Comment */}
         <div 
           style={nodeItemStyle} draggable onDragStart={(e) => onDragStart(e, 'comment')}
           onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.borderColor = '#9c27b0'; }}
@@ -955,18 +942,98 @@ const PropertiesPanel = ({
         {activeTab === 'attributes' && selectedEdge && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             <div style={{ fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase', color: '#8c8c8c' }}>{t.propEdgeStyle}</div>
-            <div>
-              <label style={{ display: 'block', fontSize: '11px', fontWeight: 'bold', marginBottom: '8px', color: '#888' }}>{t.propLabel}</label>
-              <input type="text" value={selectedEdge.label as string || ''} onChange={(e) => onUpdateEdge(selectedEdge.id, { label: e.target.value })} style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }} />
+            
+            <div style={{ padding: '16px', background: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+              <label style={{ display: 'block', fontSize: '11px', fontWeight: 'bold', marginBottom: '8px', color: '#64748b', textTransform: 'uppercase' }}>{t.propEdgeType}</label>
+              <select 
+                value={selectedEdge.type || 'default'}
+                onChange={(e) => onUpdateEdge(selectedEdge.id, { type: e.target.value })}
+                style={{ width: '100%', padding: '8px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '13px' }}
+              >
+                <option value="default">{t.edgeTypeBezier}</option>
+                <option value="straight">{t.edgeTypeStraight}</option>
+                <option value="step">{t.edgeTypeStep}</option>
+                <option value="smoothstep">{t.edgeTypeSmoothStep}</option>
+              </select>
             </div>
-            <div>
-              <label style={{ display: 'block', fontSize: '11px', fontWeight: 'bold', marginBottom: '8px', color: '#888' }}>{t.propColor}</label>
-              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                <input type="color" value={selectedEdge.style?.stroke || '#1a192b'} onChange={(e) => onUpdateEdge(selectedEdge.id, { style: { ...selectedEdge.style, stroke: e.target.value }, markerEnd: { ...(typeof selectedEdge.markerEnd === 'object' ? selectedEdge.markerEnd : { type: MarkerType.ArrowClosed }), color: e.target.value } })} style={{ width: '40px', height: '30px', padding: '0', border: 'none', cursor: 'pointer' }} />
-                <input type="text" value={selectedEdge.style?.stroke || '#1a192b'} onChange={(e) => onUpdateEdge(selectedEdge.id, { style: { ...selectedEdge.style, stroke: e.target.value } })} style={{ flex: 1, padding: '6px', fontSize: '12px', border: '1px solid #ddd', borderRadius: '4px' }} />
+
+            <div style={{ padding: '16px', background: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+              <label style={{ display: 'block', fontSize: '11px', fontWeight: 'bold', marginBottom: '8px', color: '#64748b', textTransform: 'uppercase' }}>{t.propLabel}</label>
+              <input type="text" value={selectedEdge.label as string || ''} onChange={(e) => onUpdateEdge(selectedEdge.id, { label: e.target.value })} style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '13px' }} />
+            </div>
+
+            {/* Side Selection */}
+            <div style={{ padding: '16px', background: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 'bold', marginBottom: '8px', color: '#64748b', textTransform: 'uppercase' }}>{t.propSourceSide}</label>
+                  {(() => {
+                    const sNode = nodes.find((n: any) => n.id === selectedEdge.source);
+                    const nType = sNode?.type || 'activity';
+                    const currentHId = selectedEdge.sourceHandle || '';
+                    const currentSide = getSideForHandle(nType, currentHId) || 'right';
+                    const availableSides = nType === 'artifact' ? ['left', 'right', 'top'] : nType === 'context' ? ['left', 'right', 'bottom'] : ['left', 'right', 'top', 'bottom'];
+
+                    return (
+                      <select 
+                        value={currentSide}
+                        onChange={(e) => {
+                          const side = e.target.value;
+                          if (side === currentSide && currentHId) return;
+                          onUpdateEdge(selectedEdge.id, { sourceHandle: getHandleForSide(nType, side, true, currentHId, sNode?.data) });
+                        }}
+                        style={{ width: '100%', padding: '6px', border: '1px solid #cbd5e1', borderRadius: '4px', fontSize: '12px' }}
+                      >
+                        {availableSides.map(s => (
+                          <option key={s} value={s}>{(t as any)[s] || s}</option>
+                        ))}
+                      </select>
+                    );
+                  })()}
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 'bold', marginBottom: '8px', color: '#64748b', textTransform: 'uppercase' }}>{t.propTargetSide}</label>
+                  {(() => {
+                    const tNode = nodes.find((n: any) => n.id === selectedEdge.target);
+                    const nType = tNode?.type || 'activity';
+                    const currentHId = selectedEdge.targetHandle || '';
+                    const currentSide = getSideForHandle(nType, currentHId) || 'left';
+                    const availableSides = nType === 'artifact' ? ['left', 'right', 'top'] : nType === 'context' ? ['left', 'right', 'bottom'] : ['left', 'right', 'top', 'bottom'];
+
+                    return (
+                      <select 
+                        value={currentSide}
+                        onChange={(e) => {
+                          const side = e.target.value;
+                          if (side === currentSide && currentHId) return;
+                          onUpdateEdge(selectedEdge.id, { targetHandle: getHandleForSide(nType, side, false, currentHId, tNode?.data) });
+                        }}
+                        style={{ width: '100%', padding: '6px', border: '1px solid #cbd5e1', borderRadius: '4px', fontSize: '12px' }}
+                      >
+                        {availableSides.map(s => (
+                          <option key={s} value={s}>{(t as any)[s] || s}</option>
+                        ))}
+                      </select>
+                    );
+                  })()}
+                </div>
               </div>
             </div>
-            <button onClick={() => onDeleteEdge(selectedEdge.id)} style={{ width: '100%', padding: '10px', background: '#fee2e2', color: '#ef4444', border: '1px solid #f87171', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer', marginTop: '20px' }}>{t.actionDeleteEdge}</button>
+
+            <div style={{ padding: '16px', background: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+              <label style={{ display: 'block', fontSize: '11px', fontWeight: 'bold', marginBottom: '8px', color: '#64748b', textTransform: 'uppercase' }}>{t.propColor}</label>
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                <input type="color" value={selectedEdge.style?.stroke || '#1a192b'} onChange={(e) => onUpdateEdge(selectedEdge.id, { style: { ...selectedEdge.style, stroke: e.target.value }, markerEnd: { ...(typeof selectedEdge.markerEnd === 'object' ? selectedEdge.markerEnd : { type: MarkerType.ArrowClosed }), color: e.target.value } })} style={{ width: '40px', height: '30px', padding: '0', border: 'none', cursor: 'pointer' }} />
+                <input type="text" value={selectedEdge.style?.stroke || '#1a192b'} onChange={(e) => onUpdateEdge(selectedEdge.id, { style: { ...selectedEdge.style, stroke: e.target.value } })} style={{ flex: 1, padding: '10px', fontSize: '12px', border: '1px solid #cbd5e1', borderRadius: '8px' }} />
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '16px', background: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+              <input type="checkbox" id="edge-animated" checked={selectedEdge.animated} onChange={(e) => onUpdateEdge(selectedEdge.id, { animated: e.target.checked })} style={{ width: '18px', height: '18px' }} />
+              <label htmlFor="edge-animated" style={{ fontSize: '13px', fontWeight: '600', color: '#1a192b', cursor: 'pointer' }}>{t.propEdgeAnimated}</label>
+            </div>
+
+            <button onClick={() => onDeleteEdge(selectedEdge.id)} style={{ width: '100%', padding: '14px', background: '#fee2e2', color: '#ef4444', border: '1px solid #fecdd3', borderRadius: '10px', fontWeight: 'bold', cursor: 'pointer', marginTop: '10px', transition: 'all 0.2s' }}>{t.actionDeleteEdge}</button>
           </div>
         )}
 
@@ -976,6 +1043,58 @@ const PropertiesPanel = ({
               <label style={{ display: 'block', fontSize: '11px', fontWeight: 'bold', marginBottom: '8px', color: '#64748b', textTransform: 'uppercase' }}>{t.propLabel}</label>
               <input type="text" value={node.data.label} onChange={(e) => onUpdate(node.id, { ...node.data, label: e.target.value })} style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '14px' }} />
             </div>
+
+            <div style={{ padding: '16px', background: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+              <label style={{ display: 'block', fontSize: '11px', fontWeight: 'bold', marginBottom: '8px', color: '#64748b', textTransform: 'uppercase' }}>{t.propColor || 'Color'}</label>
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                <input type="color" value={node.data.color === 'transparent' ? '#ffffff' : (node.data.color || '#ffffff')} onChange={(e) => onUpdate(node.id, { ...node.data, color: e.target.value })} style={{ width: '40px', height: '30px', padding: '0', border: 'none', cursor: 'pointer' }} />
+                <button 
+                  onClick={() => onUpdate(node.id, { ...node.data, color: 'transparent' })}
+                  style={{ padding: '4px 8px', fontSize: '11px', borderRadius: '4px', border: '1px solid #cbd5e1', background: node.data.color === 'transparent' ? '#e2e8f0' : '#fff' }}
+                >
+                  Transparent
+                </button>
+              </div>
+            </div>
+
+            {/* Label Position Controls */}
+            <div style={{ padding: '16px', background: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+              <h4 style={{ fontSize: '11px', fontWeight: 'bold', color: '#64748b', marginBottom: '10px', textTransform: 'uppercase' }}>
+                {t.labelPlacement}
+              </h4>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '10px' }}>
+                <select 
+                  value={node.data.labelPlacement || 'inside'}
+                  onChange={(e) => onUpdate(node.id, { ...node.data, labelPlacement: e.target.value })}
+                  style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '12px' }}
+                >
+                  <option value="inside">{t.labelInside}</option>
+                  <option value="outside">{t.labelOutside}</option>
+                </select>
+                <div />
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                <select 
+                  value={node.data.labelVAlign || 'top'}
+                  onChange={(e) => onUpdate(node.id, { ...node.data, labelVAlign: e.target.value })}
+                  style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '12px' }}
+                >
+                  <option value="top">{t.top}</option>
+                  <option value="middle">{t.middle}</option>
+                  <option value="bottom">{t.bottom}</option>
+                </select>
+                <select 
+                  value={node.data.labelHAlign || 'left'}
+                  onChange={(e) => onUpdate(node.id, { ...node.data, labelHAlign: e.target.value })}
+                  style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '12px' }}
+                >
+                  <option value="left">{t.left}</option>
+                  <option value="center">{t.center}</option>
+                  <option value="right">{t.right}</option>
+                </select>
+              </div>
+            </div>
+
             <div style={{ padding: '16px', background: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
               <label style={{ display: 'block', fontSize: '11px', fontWeight: 'bold', marginBottom: '8px', color: '#64748b', textTransform: 'uppercase' }}>{t.propNotes}</label>
               <textarea value={node.data.notes || ''} onChange={(e) => onUpdate(node.id, { ...node.data, notes: e.target.value })} rows={4} style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '13px', resize: 'vertical' }} placeholder="..." />
@@ -1049,6 +1168,81 @@ const PropertiesPanel = ({
       </div>
     </aside>
   );
+};
+
+
+// --- Helper Functions for Edge Handles ---
+
+const getSideForHandle = (nodeType: string, handleId: string): string => {
+  if (!handleId) return 'right';
+  const hId = handleId.toLowerCase();
+  
+  if (nodeType === 'activity') {
+    if (hId.startsWith('in-')) return 'left';
+    if (hId.startsWith('out-')) return 'right';
+    if (hId.startsWith('constraint-')) return 'top';
+    if (hId.startsWith('asset-')) return 'bottom';
+  } else if (nodeType === 'context') {
+    if (hId.startsWith('ctx-in-left')) return 'left';
+    if (hId.startsWith('ctx-out-right')) return 'right';
+    if (hId.startsWith('constraint-out')) return 'bottom';
+  } else if (nodeType === 'gate') {
+    if (hId.startsWith('in-0')) return 'left';
+    if (hId.startsWith('out-0')) return 'right';
+    if (hId.startsWith('in-1')) return 'top';
+    if (hId.startsWith('out-1')) return 'bottom';
+  } else if (nodeType === 'artifact') {
+    if (hId.startsWith('art-in')) return 'left';
+    if (hId.startsWith('art-out')) return 'right';
+    if (hId.startsWith('asset-out')) return 'top';
+  }
+  
+  // Generic fallback based on keywords in ID
+  if (hId.includes('left')) return 'left';
+  if (hId.includes('top')) return 'top';
+  if (hId.includes('bottom')) return 'bottom';
+  if (hId.includes('right')) return 'right';
+  
+  return 'right';
+};
+
+const getHandleForSide = (nodeType: string, side: string, isSource: boolean, currentHandleId: string, nodeData?: any): string => {
+  // Extract index from current handle if possible (e.g. in-1 -> index 1)
+  const indexMatch = currentHandleId?.match(/-(\d+)/);
+  let index = indexMatch ? parseInt(indexMatch[1]) : 0;
+  
+  // Validate index against node capacity if data is provided
+  if (nodeData && nodeType === 'activity') {
+    let max = 0;
+    if (side === 'left') max = (nodeData.inputs || 1) - 1;
+    if (side === 'right') max = (nodeData.outputs || 1) - 1;
+    if (side === 'top') max = (nodeData.constraints || 1) - 1;
+    if (side === 'bottom') max = (nodeData.assets || 1) - 1;
+    if (index > max) index = 0;
+  }
+
+  if (nodeType === 'activity') {
+    if (side === 'left') return isSource ? `in-${index}-dual` : `in-${index}`;
+    if (side === 'right') return isSource ? `out-${index}` : `out-${index}-dual`;
+    if (side === 'top') return isSource ? `constraint-${index}-dual` : `constraint-${index}`;
+    if (side === 'bottom') return isSource ? `asset-${index}-dual` : `asset-${index}`;
+  } else if (nodeType === 'gate') {
+    if (side === 'left') return isSource ? 'in-0-dual' : 'in-0';
+    if (side === 'right') return isSource ? 'out-0' : 'out-0-dual';
+    if (side === 'top') return isSource ? 'in-1-dual' : 'in-1';
+    if (side === 'bottom') return isSource ? 'out-1' : 'out-1-dual';
+  } else if (nodeType === 'context') {
+    if (side === 'left') return isSource ? 'ctx-in-left-dual' : 'ctx-in-left';
+    if (side === 'right') return isSource ? 'ctx-out-right' : 'ctx-out-right-dual';
+    if (side === 'bottom') return isSource ? 'constraint-out' : 'constraint-out-dual';
+  } else if (nodeType === 'artifact') {
+    if (side === 'left') return isSource ? 'art-in-dual' : 'art-in';
+    if (side === 'right') return isSource ? 'art-out' : 'art-out-dual';
+    if (side === 'top') return isSource ? 'asset-out' : 'asset-out-dual';
+  }
+  
+  // Default fallbacks
+  return isSource ? 'out-0' : 'in-0';
 };
 
 
@@ -1220,6 +1414,10 @@ const DnDFlow = React.memo(() => {
       data: { 
         label: `${type.charAt(0).toUpperCase() + type.slice(1)}`,
         notes: nodeDescriptions[type] || '',
+        color: 'transparent',
+        labelPlacement: 'inside',
+        labelVAlign: 'top',
+        labelHAlign: 'left',
         inputs: type === 'activity' ? 1 : undefined,
         outputs: type === 'activity' ? 1 : undefined,
         constraints: type === 'activity' ? 1 : undefined,
@@ -1467,6 +1665,8 @@ const DnDFlow = React.memo(() => {
       <div style={{ flex: 1, position: 'relative' }} ref={reactFlowWrapper} onDrop={onDrop} onDragOver={(e: any) => e.preventDefault()}>
         <ReactFlow
           nodes={nodes} edges={edges}
+          elevateEdgesOnSelect={true}
+          connectionMode={ConnectionMode.Loose}
           onNodesChange={onNodesChange} onEdgesChange={onEdgesChange} onConnect={onConnect}
           onInit={setReactFlowInstance} nodeTypes={nodeTypes} fitView
           nodesDraggable={true} elementsSelectable={true}
@@ -1587,6 +1787,7 @@ const DnDFlow = React.memo(() => {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ 
+                id: typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2, 15) + Date.now().toString(36), 
                 ...saveData, 
                 type: 'free', 
                 data: { nodes, edges },

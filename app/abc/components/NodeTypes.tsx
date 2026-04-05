@@ -93,8 +93,8 @@ export const nodeStyle: React.CSSProperties = {
 };
 
 export const getLabelPositionStyle = (data: any, defaultPlacement: 'inside' | 'outside' = 'inside'): React.CSSProperties => {
-  const vAlign = data.labelVAlign || 'middle';
-  const hAlign = data.labelHAlign || 'center';
+  const vAlign = data.labelVAlign || 'top';
+  const hAlign = data.labelHAlign || 'left';
   const place = data.labelPlacement || defaultPlacement;
 
   if (place === 'inside') {
@@ -152,37 +152,77 @@ export const getLabelPositionStyle = (data: any, defaultPlacement: 'inside' | 'o
 };
 
 export const CommentNode = ({ data, selected }: NodeProps) => {
+  const labelStyle = getLabelPositionStyle(data, 'inside');
+  
   return (
     <>
-      <NodeResizer minWidth={100} minHeight={30} isVisible={selected} lineClassName="border-purple-400" handleClassName="bg-white border-purple-400" />
-      <div style={{
-        width: '100%',
-        height: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        background: 'transparent',
-        padding: '5px',
-        color: data.color || '#9c27b0', // Purple by default
-        fontSize: '14px',
-        fontWeight: '500',
-        whiteSpace: 'pre-wrap',
-        wordBreak: 'break-word',
-        textAlign: 'left',
-        position: 'relative',
-        fontStyle: 'italic',
-        pointerEvents: 'auto'
+      <NodeResizer minWidth={100} minHeight={40} isVisible={selected} lineClassName="border-purple-400" handleClassName="bg-white border-purple-400" />
+      <div className="react-flow__node-drag-handle" style={{ 
+        ...nodeStyle, 
+        border: 'none', 
+        background: 'transparent', 
+        boxShadow: 'none', 
+        padding: 0, 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center' 
       }}>
-        <div className="react-flow__node-drag-handle" style={{ position: 'absolute', inset: 0, zIndex: 0 }} />
-        {/* Input handles for comments - allows them to be targets */}
-        <Handle type="target" position={Position.Left} style={{ left: '-4px', background: '#9c27b0', border: '1px solid #fff', zIndex: 1000, pointerEvents: 'auto' }} />
-        <Handle type="target" position={Position.Top} style={{ top: '-4px', left: '50%', transform: 'translateX(-50%)', background: '#9c27b0', border: '1px solid #fff', zIndex: 1000, pointerEvents: 'auto' }} />
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: data.color || '#fdf4ff',
+          border: '1px dashed #9c27b0',
+          borderRadius: '4px',
+          opacity: 0.8,
+          zIndex: -1
+        }} />
         
-        {/* Output handles for comments - allows them to be sources */}
-        <Handle type="source" position={Position.Right} style={{ right: '-4px', background: '#9c27b0', border: '1px solid #fff', zIndex: 1000, pointerEvents: 'auto' }} />
-        <Handle type="source" position={Position.Bottom} style={{ bottom: '-4px', left: '50%', transform: 'translateX(-50%)', background: '#9c27b0', border: '1px solid #fff', zIndex: 1000, pointerEvents: 'auto' }} />
-
-        {data.label}
+        <div style={labelStyle}>
+          <div style={{
+            fontSize: '12px',
+            color: '#701a75',
+            fontStyle: 'italic',
+            padding: '4px 8px',
+            background: 'rgba(255, 255, 255, 0.6)',
+            borderRadius: '4px',
+            whiteSpace: 'pre-wrap',
+            wordBreak: 'break-word',
+            textAlign: 'center',
+            pointerEvents: 'none'
+          }}>
+            {data.label}
+          </div>
+        </div>
       </div>
+    </>
+  );
+};
+
+export const DualHandle = (props: any) => {
+  const { type, position, id, style, ...rest } = props;
+  const isTarget = type === 'target';
+  
+  return (
+    <>
+      {/* Primary Handle (Maintains existence of original ID for compatibility) */}
+      <Handle
+        type={type}
+        position={position}
+        id={id}
+        style={{ ...style, zIndex: 11 }}
+        {...rest}
+      />
+      {/* Secondary Handle (Provides the "other" property) */}
+      <Handle
+        type={isTarget ? 'source' : 'target'}
+        position={position}
+        id={`${id}-dual`}
+        style={{ ...style, zIndex: 10 }}
+        {...rest}
+      />
     </>
   );
 };
@@ -203,7 +243,7 @@ export const CriterionHandle = ({ type, position, id, index, total, color }: { t
     const leftOrRightStyle = position === Position.Left ? { left: '-8px' } : { right: '-8px' };
 
     return (
-      <Handle
+      <DualHandle
         type={type}
         position={position}
         id={id}
@@ -217,7 +257,6 @@ export const CriterionHandle = ({ type, position, id, index, total, color }: { t
           clipPath,
           top,
           ...leftOrRightStyle,
-          zIndex: 10,
           pointerEvents: 'auto'
         }}
       />
@@ -229,7 +268,7 @@ export const CriterionHandle = ({ type, position, id, index, total, color }: { t
 
     if (position === Position.Top) {
       return (
-        <Handle
+        <DualHandle
           type={type}
           position={position}
           id={id}
@@ -243,14 +282,13 @@ export const CriterionHandle = ({ type, position, id, index, total, color }: { t
             clipPath,
             top: '-8px',
             left,
-            zIndex: 10,
             pointerEvents: 'auto'
           }}
         />
       );
     } else {
       return (
-        <Handle
+        <DualHandle
           type={type}
           position={position}
           id={id}
@@ -264,7 +302,6 @@ export const CriterionHandle = ({ type, position, id, index, total, color }: { t
             clipPath,
             bottom: '-8px',
             left,
-            zIndex: 10,
             pointerEvents: 'auto'
           }}
         />
@@ -274,7 +311,7 @@ export const CriterionHandle = ({ type, position, id, index, total, color }: { t
     // Fallback for single or non-indexed handles
     if (position === Position.Top) {
       return (
-        <Handle
+        <DualHandle
           type={type}
           position={position}
           id={id}
@@ -288,7 +325,6 @@ export const CriterionHandle = ({ type, position, id, index, total, color }: { t
             clipPath,
             top: '-8px',
             left: '50%',
-            zIndex: 10,
             pointerEvents: 'auto'
           }}
         />
@@ -296,7 +332,7 @@ export const CriterionHandle = ({ type, position, id, index, total, color }: { t
     }
  else if (position === Position.Bottom) {
       return (
-        <Handle
+        <DualHandle
           type={type}
           position={position}
           id={id}
@@ -310,7 +346,6 @@ export const CriterionHandle = ({ type, position, id, index, total, color }: { t
             clipPath,
             bottom: '-8px',
             left: '50%',
-            zIndex: 10,
             pointerEvents: 'auto'
           }}
         />
@@ -318,7 +353,7 @@ export const CriterionHandle = ({ type, position, id, index, total, color }: { t
     }
 
     return (
-      <Handle
+      <DualHandle
         type={type}
         position={position}
         id={id}
@@ -332,7 +367,6 @@ export const CriterionHandle = ({ type, position, id, index, total, color }: { t
           clipPath,
           top: '50%',
           left: '50%',
-          zIndex: 10,
           pointerEvents: 'auto'
         }}
       />
@@ -352,137 +386,29 @@ export const ActivityNode = ({ data, selected }: NodeProps) => {
   // Check if any connected handle is missing documentation
   const hasIncompleteHandles = connectedHandleIds.some((hid: string) => !data.handleData?.[hid]?.description);
   const showWarning = !isDocumented || hasIncompleteHandles;
-
+  const labelStyle = getLabelPositionStyle(data, 'inside');
+  
   return (
     <>
       <NodeResizer minWidth={NODE_WIDTH} minHeight={NODE_HEIGHT} isVisible={selected} lineClassName="border-blue-400" handleClassName="bg-white border-blue-400" />
       <div className="react-flow__node-drag-handle" style={{
         ...nodeStyle,
-        background: data.bgImage ? `url(${data.bgImage})` : (data.color || 'rgba(255, 255, 255, 0.8)'),
+        background: data.bgImage ? `url(${data.bgImage})` : (data.color || 'transparent'),
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         borderRadius: '8px',
         border: '2px solid #1a192b',
         overflow: 'visible',
-        pointerEvents: 'auto'
+        pointerEvents: 'auto',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 2
       }}>
         {showWarning && <ValidationWarning title={!isDocumented ? "Node documentation missing" : "Handle documentation missing"} />}
-        {data.bgImage && (
-          <div style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: 'rgba(255, 255, 255, 0.3)',
-            zIndex: 0
-          }} />
-        )}
-        {/* Constraint Handles (Top) */}
-        {Array.from({ length: constraints }).map((_, i) => {
-          const step = NODE_WIDTH / (constraints + 1);
-          const left = `${step * (i + 1)}px`;
-          const handle = data.handleData?.[`constraint-${i}`];
-          const isConnected = connectedHandleIds.includes(`constraint-${i}`);
-          const isHandleDocumented = !!handle?.description;
-          return (
-            <React.Fragment key={`constraint-group-${i}`}>
-              <CriterionHandle type="target" position={Position.Top} id={`constraint-${i}`} index={i} total={constraints} color="#4caf50" />
-              {isConnected && !isHandleDocumented && (
-                <div style={{ position: 'absolute', top: '-15px', left: '50%', transform: 'translateX(-50%)', fontSize: '10px', color: '#ff4d4f', zIndex: 100 }}>⚠️</div>
-              )}
-              {handle?.name && (
-                <div style={{
-                  position: 'absolute',
-                  top: '10px',
-                  left,
-                  transform: 'translateX(-50%)',
-                  fontSize: '9px',
-                  color: '#4caf50',
-                  fontWeight: 'bold',
-                  pointerEvents: 'none',
-                  whiteSpace: 'nowrap',
-                  maxWidth: '60px',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis'
-                }}>
-                  {handle.name}
-                </div>
-              )}
-            </React.Fragment>
-          );
-        })}
-
-        {/* Asset Handles (Bottom) */}
-        {Array.from({ length: assets }).map((_, i) => {
-          const step = NODE_WIDTH / (assets + 1);
-          const left = `${step * (i + 1)}px`;
-          const handle = data.handleData?.[`asset-${i}`];
-          const isConnected = connectedHandleIds.includes(`asset-${i}`);
-          const isHandleDocumented = !!handle?.description;
-          return (
-            <React.Fragment key={`asset-group-${i}`}>
-              <CriterionHandle type="target" position={Position.Bottom} id={`asset-${i}`} index={i} total={assets} color="#ff9800" />
-              {isConnected && !isHandleDocumented && (
-                <div style={{ position: 'absolute', bottom: '-15px', left: '50%', transform: 'translateX(-50%)', fontSize: '10px', color: '#ff4d4f', zIndex: 100 }}>⚠️</div>
-              )}
-              {handle?.name && (
-                <div style={{
-                  position: 'absolute',
-                  bottom: '10px',
-                  left,
-                  transform: 'translateX(-50%)',
-                  fontSize: '9px',
-                  color: '#ff9800',
-                  fontWeight: 'bold',
-                  pointerEvents: 'none',
-                  whiteSpace: 'nowrap',
-                  maxWidth: '60px',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis'
-                }}>
-                  {handle.name}
-                </div>
-              )}
-            </React.Fragment>
-          );
-        })}
-
-        {Array.from({ length: inputs }).map((_, i) => {
-          const step = NODE_HEIGHT / (inputs + 1);
-          const top = step * (i + 1);
-          const handle = data.handleData?.[`in-${i}`];
-          const isConnected = connectedHandleIds.includes(`in-${i}`);
-          const isHandleDocumented = !!handle?.description;
-          return (
-            <React.Fragment key={`in-group-${i}`}>
-              <CriterionHandle type="target" position={Position.Left} id={`in-${i}`} index={i} total={inputs} />
-              {isConnected && !isHandleDocumented && (
-                <div style={{ position: 'absolute', top: '50%', left: '-15px', transform: 'translateY(-50%)', fontSize: '10px', color: '#ff4d4f', zIndex: 100 }}>⚠️</div>
-              )}
-              {handle?.name && (
-                <div style={{
-                  position: 'absolute',
-                  top: `${top}px`,
-                  left: '10px',
-                  transform: 'translateY(-50%)',
-                  fontSize: '9px',
-                  color: '#2196f3',
-                  fontWeight: 'bold',
-                  pointerEvents: 'none',
-                  whiteSpace: 'nowrap',
-                  maxWidth: '60px',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis'
-                }}>
-                  {handle.name}
-                </div>
-              )}
-            </React.Fragment>
-          );
-        })}
-
-        <div style={getLabelPositionStyle(data, 'inside')}>
+        
+        {/* Label Container */}
+        <div style={labelStyle}>
           <div style={{
             display: 'flex',
             flexDirection: 'column',
@@ -493,7 +419,8 @@ export const ActivityNode = ({ data, selected }: NodeProps) => {
             borderRadius: '8px',
             boxShadow: data.bgImage ? '0 2px 10px rgba(0,0,0,0.1)' : 'none',
             position: 'relative',
-            minWidth: '60px'
+            minWidth: '60px',
+            pointerEvents: 'none'
           }}>
             {/* Corner Icon */}
             {data.icon && data.iconPosition && data.iconPosition !== 'center' && (
@@ -530,6 +457,110 @@ export const ActivityNode = ({ data, selected }: NodeProps) => {
           </div>
         </div>
 
+        {/* Constraint Handles (Top) */}
+        {Array.from({ length: constraints }).map((_, i) => {
+          const step = NODE_WIDTH / (constraints + 1);
+          const left = `${step * (i + 1)}px`;
+          const handle = data.handleData?.[`constraint-${i}`];
+          const isHandleConnected = connectedHandleIds.some((hid: string) => hid === `constraint-${i}` || hid === `constraint-${i}-dual`);
+          const isHandleDocumented = !!handle?.description;
+          return (
+            <React.Fragment key={`constraint-group-${i}`}>
+              <CriterionHandle type="target" position={Position.Top} id={`constraint-${i}`} index={i} total={constraints} color="#4caf50" />
+              {isHandleConnected && !isHandleDocumented && (
+                <div style={{ position: 'absolute', top: '-15px', left: '50%', transform: 'translateX(-50%)', fontSize: '10px', color: '#ff4d4f', zIndex: 100 }}>⚠️</div>
+              )}
+              {handle?.name && (
+                <div style={{
+                  position: 'absolute',
+                  top: '10px',
+                  left,
+                  transform: 'translateX(-50%)',
+                  fontSize: '9px',
+                  color: '#4caf50',
+                  fontWeight: 'bold',
+                  pointerEvents: 'none',
+                  whiteSpace: 'nowrap',
+                  maxWidth: '60px',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis'
+                }}>
+                  {handle.name}
+                </div>
+              )}
+            </React.Fragment>
+          );
+        })}
+
+        {/* Asset Handles (Bottom) */}
+        {Array.from({ length: assets }).map((_, i) => {
+          const step = NODE_WIDTH / (assets + 1);
+          const left = `${step * (i + 1)}px`;
+          const handle = data.handleData?.[`asset-${i}`];
+          const isHandleConnected = connectedHandleIds.some((hid: string) => hid === `asset-${i}` || hid === `asset-${i}-dual`);
+          const isHandleDocumented = !!handle?.description;
+          return (
+            <React.Fragment key={`asset-group-${i}`}>
+              <CriterionHandle type="target" position={Position.Bottom} id={`asset-${i}`} index={i} total={assets} color="#ff9800" />
+              {isHandleConnected && !isHandleDocumented && (
+                <div style={{ position: 'absolute', bottom: '-15px', left: '50%', transform: 'translateX(-50%)', fontSize: '10px', color: '#ff4d4f', zIndex: 100 }}>⚠️</div>
+              )}
+              {handle?.name && (
+                <div style={{
+                  position: 'absolute',
+                  bottom: '10px',
+                  left,
+                  transform: 'translateX(-50%)',
+                  fontSize: '9px',
+                  color: '#ff9800',
+                  fontWeight: 'bold',
+                  pointerEvents: 'none',
+                  whiteSpace: 'nowrap',
+                  maxWidth: '60px',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis'
+                }}>
+                  {handle.name}
+                </div>
+              )}
+            </React.Fragment>
+          );
+        })}
+
+        {Array.from({ length: inputs }).map((_, i) => {
+          const step = NODE_HEIGHT / (inputs + 1);
+          const top = step * (i + 1);
+          const handle = data.handleData?.[`in-${i}`];
+          const isHandleConnected = connectedHandleIds.some((hid: string) => hid === `in-${i}` || hid === `in-${i}-dual`);
+          const isHandleDocumented = !!handle?.description;
+          return (
+            <React.Fragment key={`in-group-${i}`}>
+              <CriterionHandle type="target" position={Position.Left} id={`in-${i}`} index={i} total={inputs} />
+              {isHandleConnected && !isHandleDocumented && (
+                <div style={{ position: 'absolute', top: '50%', left: '-15px', transform: 'translateY(-50%)', fontSize: '10px', color: '#ff4d4f', zIndex: 100 }}>⚠️</div>
+              )}
+              {handle?.name && (
+                <div style={{
+                  position: 'absolute',
+                  top: `${top}px`,
+                  left: '10px',
+                  transform: 'translateY(-50%)',
+                  fontSize: '9px',
+                  color: '#2196f3',
+                  fontWeight: 'bold',
+                  pointerEvents: 'none',
+                  whiteSpace: 'nowrap',
+                  maxWidth: '60px',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis'
+                }}>
+                  {handle.name}
+                </div>
+              )}
+            </React.Fragment>
+          );
+        })}
+
         {data.notes && !(data.lockNotes && !isMember && !isOperational) && (
           <div style={{ position: 'absolute', bottom: '5px', right: '5px', fontSize: '12px', color: '#1a192b', zIndex: 1 }}>📝</div>
         )}
@@ -538,12 +569,12 @@ export const ActivityNode = ({ data, selected }: NodeProps) => {
           const step = NODE_HEIGHT / (outputs + 1);
           const top = step * (i + 1);
           const handle = data.handleData?.[`out-${i}`];
-          const isConnected = connectedHandleIds.includes(`out-${i}`);
+          const isHandleConnected = connectedHandleIds.some((hid: string) => hid === `out-${i}` || hid === `out-${i}-dual`);
           const isHandleDocumented = !!handle?.description;
           return (
             <React.Fragment key={`out-group-${i}`}>
               <CriterionHandle type="source" position={Position.Right} id={`out-${i}`} index={i} total={outputs} />
-              {isConnected && !isHandleDocumented && (
+              {isHandleConnected && !isHandleDocumented && (
                 <div style={{ position: 'absolute', top: '50%', right: '-15px', transform: 'translateY(-50%)', fontSize: '10px', color: '#ff4d4f', zIndex: 100 }}>⚠️</div>
               )}
               {handle?.name && (
@@ -576,7 +607,7 @@ export const ActivityNode = ({ data, selected }: NodeProps) => {
 export const ArtifactNode = ({ data, selected }: NodeProps) => {
   const { isMember, isOperational } = useLanguage();
   const isDocumented = !!data.notes;
-  const showWarning = !isDocumented && !data.isRoot; // Don't warn on internal context usage if it's just a structural element, but Artifacts should be documented
+  const showWarning = !isDocumented && !data.isRoot;
   return (
     <>
       <NodeResizer minWidth={NODE_WIDTH} minHeight={NODE_HEIGHT} isVisible={selected} lineClassName="border-blue-400" handleClassName="bg-white border-blue-400" />
@@ -585,7 +616,7 @@ export const ArtifactNode = ({ data, selected }: NodeProps) => {
         <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none" style={{ position: 'absolute', top: 0, left: 0, zIndex: -1 }}>
           <polygon
             points="10,2 90,2 98,15 98,85 90,98 10,98 2,85 2,15"
-            fill={data.bgImage ? 'transparent' : (data.color || 'rgba(255, 255, 255, 0.9)')}
+            fill={data.bgImage ? 'transparent' : (data.color || 'transparent')}
             stroke="#2196f3"
             strokeWidth="3"
             vectorEffect="non-scaling-stroke"
@@ -617,28 +648,49 @@ export const ArtifactNode = ({ data, selected }: NodeProps) => {
             padding: data.bgImage ? '6px 12px' : '0',
             borderRadius: '8px',
             boxShadow: data.bgImage ? '0 2px 10px rgba(0,0,0,0.1)' : 'none',
+            position: 'relative',
+            minWidth: '100px',
+            pointerEvents: 'none'
           }}>
-            <NodeIcon iconName={data.icon} color="#2196f3" size={24} />
+            <NodeIcon iconName={data.icon} color="#9a3412" size={24} />
             <div style={{
               fontWeight: 'bold',
-              fontSize: '14px',
-              textAlign: 'center',
-              width: '100%',
+              fontSize: '18px',
+              color: '#431407',
+              marginTop: '4px',
               wordBreak: 'break-word',
+              textAlign: 'center'
             }}>
               {data.label}
             </div>
           </div>
         </div>
 
-        <Handle type="target" position={Position.Left} style={{ background: '#2196f3', left: '-2px', zIndex: 1000, pointerEvents: 'auto' }} />
+        <React.Fragment>
+          <DualHandle type="target" position={Position.Left} id="art-in" style={{ background: '#2196f3', left: '-2px', pointerEvents: 'auto' }} />
+          {data.validation?.connectedHandleIds?.some((hid: string) => hid === 'art-in' || hid === 'art-in-dual') && !data.handleData?.['art-in']?.description && (
+            <div style={{ position: 'absolute', top: '50%', left: '-10px', transform: 'translateY(-50%)', fontSize: '10px', color: '#ff4d4f', zIndex: 100 }}>⚠️</div>
+          )}
+        </React.Fragment>
+
         {data.notes && !(data.lockNotes && !isMember && !isOperational) && (
           <div style={{ position: 'absolute', bottom: '10px', right: '20%', fontSize: '12px', color: '#1a192b', zIndex: 1, pointerEvents: 'none' }}>📝</div>
         )}
-        <Handle type="source" position={Position.Right} style={{ background: '#2196f3', right: '-2px', zIndex: 1000, pointerEvents: 'auto' }} />
+
+        <React.Fragment>
+          <DualHandle type="source" position={Position.Right} id="art-out" style={{ background: '#2196f3', right: '-2px', pointerEvents: 'auto' }} />
+          {data.validation?.connectedHandleIds?.some((hid: string) => hid === 'art-out' || hid === 'art-out-dual') && !data.handleData?.['art-out']?.description && (
+            <div style={{ position: 'absolute', top: '50%', right: '-10px', transform: 'translateY(-50%)', fontSize: '10px', color: '#ff4d4f', zIndex: 100 }}>⚠️</div>
+          )}
+        </React.Fragment>
 
         {/* Asset Source (Top) for IDEF0 Mechanism */}
-        <Handle type="source" position={Position.Top} id="asset-out" style={{ background: '#ff9800', top: '-2px', zIndex: 1000, pointerEvents: 'auto' }} />
+        <React.Fragment>
+          <DualHandle type="source" position={Position.Top} id="asset-out" style={{ background: '#ff9800', top: '-2px', pointerEvents: 'auto' }} />
+          {data.validation?.connectedHandleIds?.some((hid: string) => hid === 'asset-out' || hid === 'asset-out-dual') && !data.handleData?.['asset-out']?.description && (
+            <div style={{ position: 'absolute', top: '-10px', left: '50%', transform: 'translateX(-50%)', fontSize: '10px', color: '#ff4d4f', zIndex: 100 }}>⚠️</div>
+          )}
+        </React.Fragment>
       </div>
     </>
   );
@@ -696,7 +748,7 @@ export const ContextNode = ({ data, selected }: NodeProps) => {
         <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none" style={{ position: 'absolute', top: 0, left: 0, zIndex: -1, pointerEvents: 'none' }}>
           <rect
             x="2" y="2" width="96" height="96" rx="8" ry="8"
-            fill={data.bgImage ? 'transparent' : (isRoot ? 'transparent' : (data.color || 'rgba(239, 246, 255, 0.4)'))}
+            fill={data.bgImage ? 'transparent' : (data.color || 'transparent')}
             stroke={isRoot ? '#cbd5e1' : '#3b82f6'}
             strokeWidth={isRoot ? '2' : '2'}
             strokeDasharray={isRoot ? '8,4' : 'none'}
@@ -719,8 +771,14 @@ export const ContextNode = ({ data, selected }: NodeProps) => {
             <div style={{ position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.2)' }} />
           </div>
         )}
-        <Handle type="target" position={Position.Left} id="ctx-in-left" style={{ background: '#03a9f4', left: '-2px', pointerEvents: 'auto', zIndex: 10 }} />
-        <div style={{...getLabelPositionStyle(isRoot ? { ...data, labelVAlign: 'top', labelHAlign: 'center' } : data, 'inside'), pointerEvents: 'auto'}}>
+        <React.Fragment>
+          <DualHandle type="target" position={Position.Left} id="ctx-in-left" style={{ background: '#03a9f4', left: '-2px', pointerEvents: 'auto' }} />
+          {data.validation?.connectedHandleIds?.some((hid: string) => hid === 'ctx-in-left' || hid === 'ctx-in-left-dual') && !data.handleData?.['ctx-in-left']?.description && (
+            <div style={{ position: 'absolute', top: '50%', left: '-10px', transform: 'translateY(-50%)', fontSize: '10px', color: '#ff4d4f', zIndex: 100 }}>⚠️</div>
+          )}
+        </React.Fragment>
+
+        <div style={{...getLabelPositionStyle(data, 'inside'), pointerEvents: 'auto'}}>
           <div style={{
             display: 'flex',
             flexDirection: 'column',
@@ -749,10 +807,21 @@ export const ContextNode = ({ data, selected }: NodeProps) => {
         {data.notes && !(data.lockNotes && !isMember && !isOperational) && (
           <div style={{ position: 'absolute', bottom: '10px', right: '20%', fontSize: '12px', color: '#1a192b', opacity: isRoot ? 0.5 : 1, zIndex: 1 }}>📝</div>
         )}
-        <Handle type="source" position={Position.Right} id="ctx-out-right" style={{ background: '#03a9f4', right: '-2px', pointerEvents: 'auto', zIndex: 10 }} />
+
+        <React.Fragment>
+          <DualHandle type="source" position={Position.Right} id="ctx-out-right" style={{ background: '#03a9f4', right: '-2px', pointerEvents: 'auto' }} />
+          {data.validation?.connectedHandleIds?.some((hid: string) => hid === 'ctx-out-right' || hid === 'ctx-out-right-dual') && !data.handleData?.['ctx-out-right']?.description && (
+            <div style={{ position: 'absolute', top: '50%', right: '-10px', transform: 'translateY(-50%)', fontSize: '10px', color: '#ff4d4f', zIndex: 100 }}>⚠️</div>
+          )}
+        </React.Fragment>
 
         {/* Constraint Source (Bottom) for IDEF0 Control */}
-        <Handle type="source" position={Position.Bottom} id="constraint-out" style={{ background: '#4caf50', bottom: '-2px', pointerEvents: 'auto', zIndex: 10 }} />
+        <React.Fragment>
+          <DualHandle type="source" position={Position.Bottom} id="constraint-out" style={{ background: '#4caf50', bottom: '-2px', pointerEvents: 'auto' }} />
+          {data.validation?.connectedHandleIds?.some((hid: string) => hid === 'constraint-out' || hid === 'constraint-out-dual') && !data.handleData?.['constraint-out']?.description && (
+            <div style={{ position: 'absolute', bottom: '-10px', left: '50%', transform: 'translateX(-50%)', fontSize: '10px', color: '#ff4d4f', zIndex: 100 }}>⚠️</div>
+          )}
+        </React.Fragment>
       </div>
     </>
   );
@@ -776,7 +845,7 @@ export const GateNode = ({ data, selected }: NodeProps) => {
         <svg width="80" height="80" style={{ position: 'absolute', top: 0, left: 0, overflow: 'visible', zIndex: -1 }}>
           <polygon
             points="40,0 80,40 40,80 0,40"
-            fill={data.bgImage ? 'transparent' : (data.color || 'rgba(255, 255, 255, 0.9)')}
+            fill={data.bgImage ? 'transparent' : (data.color || 'transparent')}
             stroke="#1a192b"
             strokeWidth="2"
             style={{ filter: selected ? 'drop-shadow(0 0 4px #2196f3)' : 'none' }}
@@ -825,7 +894,12 @@ export const GateNode = ({ data, selected }: NodeProps) => {
 
         {/* Handles aligned to the diamond's points with labels */}
         {/* Input (Left) - in-0 */}
-        <Handle type="target" position={Position.Left} id="in-0" style={{ left: '-4px', top: '40px', background: '#3b82f6', border: '1px solid #fff', zIndex: 10, pointerEvents: 'auto' }} />
+        <React.Fragment>
+          <DualHandle type="target" position={Position.Left} id="in-0" style={{ left: '-4px', top: '40px', background: '#3b82f6', border: '1px solid #fff', pointerEvents: 'auto' }} />
+          {data.validation?.connectedHandleIds?.some((hid: string) => hid === 'in-0' || hid === 'in-0-dual') && !data.handleData?.['in-0']?.description && (
+             <div style={{ position: 'absolute', top: '40px', left: '-12px', transform: 'translateY(-50%)', fontSize: '10px', color: '#ff4d4f', zIndex: 100 }}>⚠️</div>
+          )}
+        </React.Fragment>
         {data.handleData?.['in-0']?.name && (
           <div style={{ position: 'absolute', top: '40px', left: '10px', transform: 'translateY(-50%)', fontSize: '9px', color: '#3b82f6', fontWeight: 'bold', pointerEvents: 'none' }}>
             {data.handleData['in-0'].name}
@@ -833,7 +907,12 @@ export const GateNode = ({ data, selected }: NodeProps) => {
         )}
 
         {/* Output 1 (Right) - out-0 */}
-        <Handle type="source" position={Position.Right} id="out-0" style={{ right: '-4px', top: '40px', background: '#f43f5e', border: '1px solid #fff', zIndex: 10, pointerEvents: 'auto' }} />
+        <React.Fragment>
+          <DualHandle type="source" position={Position.Right} id="out-0" style={{ right: '-4px', top: '40px', background: '#f43f5e', border: '1px solid #fff', pointerEvents: 'auto' }} />
+          {data.validation?.connectedHandleIds?.some((hid: string) => hid === 'out-0' || hid === 'out-0-dual') && !data.handleData?.['out-0']?.description && (
+             <div style={{ position: 'absolute', top: '40px', right: '-12px', transform: 'translateY(-50%)', fontSize: '10px', color: '#ff4d4f', zIndex: 100 }}>⚠️</div>
+          )}
+        </React.Fragment>
         {data.handleData?.['out-0']?.name && (
           <div style={{ position: 'absolute', top: '40px', right: '10px', transform: 'translateY(-50%)', fontSize: '9px', color: '#f43f5e', fontWeight: 'bold', pointerEvents: 'none', textAlign: 'right' }}>
             {data.handleData['out-0'].name}
@@ -841,10 +920,20 @@ export const GateNode = ({ data, selected }: NodeProps) => {
         )}
 
         {/* Input/Alternative (Top) - in-1 or top-in */}
-        <Handle type="target" position={Position.Top} id="in-1" style={{ top: '-4px', left: '40px', background: '#10b981', border: '1px solid #fff', zIndex: 10, pointerEvents: 'auto' }} />
+        <React.Fragment>
+          <DualHandle type="target" position={Position.Top} id="in-1" style={{ top: '-4px', left: '40px', background: '#10b981', border: '1px solid #fff', pointerEvents: 'auto' }} />
+          {data.validation?.connectedHandleIds?.some((hid: string) => hid === 'in-1' || hid === 'in-1-dual') && !data.handleData?.['in-1']?.description && (
+             <div style={{ position: 'absolute', top: '-12px', left: '40px', transform: 'translateX(-50%)', fontSize: '10px', color: '#ff4d4f', zIndex: 100 }}>⚠️</div>
+          )}
+        </React.Fragment>
 
         {/* Output 2 (Bottom) - out-1 */}
-        <Handle type="source" position={Position.Bottom} id="out-1" style={{ bottom: '-4px', left: '40px', background: '#f43f5e', border: '1px solid #fff', zIndex: 10, pointerEvents: 'auto' }} />
+        <React.Fragment>
+          <DualHandle type="source" position={Position.Bottom} id="out-1" style={{ bottom: '-4px', left: '40px', background: '#f43f5e', border: '1px solid #fff', pointerEvents: 'auto' }} />
+          {data.validation?.connectedHandleIds?.some((hid: string) => hid === 'out-1' || hid === 'out-1-dual') && !data.handleData?.['out-1']?.description && (
+             <div style={{ position: 'absolute', bottom: '-12px', left: '40px', transform: 'translateX(-50%)', fontSize: '10px', color: '#ff4d4f', zIndex: 100 }}>⚠️</div>
+          )}
+        </React.Fragment>
         {data.handleData?.['out-1']?.name && (
           <div style={{ position: 'absolute', bottom: '10px', left: '40px', transform: 'translateX(-50%)', fontSize: '9px', color: '#f43f5e', fontWeight: 'bold', pointerEvents: 'none' }}>
             {data.handleData['out-1'].name}
