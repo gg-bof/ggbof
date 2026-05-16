@@ -11,6 +11,9 @@
     "pages:deploy": "pnpm pages:build && wrangler pages deploy .vercel/output/static"
   },
   "dependencies": {
+    "@mdx-js/loader": "^3.1.1",
+    "@mdx-js/react": "^3.1.1",
+    "@next/mdx": "^16.2.6",
     "@clerk/nextjs": "^7.0.1",
     "@libsql/client": "^0.17.0",
     "drizzle-orm": "^0.45.1",
@@ -19,9 +22,12 @@
     "mermaid": "^11.12.3",
     "next": "16.1.6",
     "next-themes": "^0.4.6",
+    "puppeteer": "^24.43.1",
     "react": "19.2.3",
     "react-dom": "19.2.3",
-    "reactflow": "^11.11.4"
+    "reactflow": "^11.11.4",
+    "remark-frontmatter": "^5.0.0",
+    "remark-mdx-frontmatter": "^5.2.0"
   },
   "devDependencies": {
     "@cloudflare/next-on-pages": "^1.13.16",

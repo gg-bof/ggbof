@@ -1,0 +1,25 @@
+---
+theme: 'Quality Keeps Resetting When Personnel Change'
+painPoint: '"What format should I hand this off in?" "The previous person did it differently." "I had to re-verify everything after the handoff." — Does quality reset every time someone new takes over?'
+tag: 'Collaboration & Quality'
+color: '#4f46e5'
+relatedPatterns: ['horizontal-contract', 'context-pattern', 'sequence', 'synchronization']
+---
+
+## Context
+
+Multiple approaches exist for passing information between activities. The chosen model significantly affects process visibility, flexibility, and reliability. Many organizations, prioritizing simplicity, leave execution conditions and quality standards implicit.
+
+## Anti-patterns
+
+### Task-Chain (To-Do List)
+
+Connecting activities with arrows only shows processing order. Pre-conditions (why the activity can execute) and post-conditions (what it guarantees) are hidden, causing failure when personnel change.
+
+### Artifact-Centric
+
+Merely placing artifacts between activities tends to become one-sided delivery from upstream. Quality standards required by downstream processes go unconfirmed.
+
+## Recommendation
+
+Define activities using the **Contract Pattern** with explicit pre-conditions (Input/Control) and post-conditions (Output). This ensures consistent quality regardless of who or what system performs the activity, and eases transitions to automation.

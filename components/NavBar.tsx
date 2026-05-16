@@ -37,8 +37,14 @@ export default function NavBar() {
                 <Link href="/" style={{ color: 'var(--foreground)', opacity: 0.7, textDecoration: 'none', fontSize: '14px', fontWeight: 500, transition: 'opacity 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.opacity = '1'} onMouseLeave={(e) => e.currentTarget.style.opacity = '0.7'}>
                     {lang === 'ja' ? 'ホーム' : 'Home'}
                 </Link>
+                <Link href="/pattern/views" style={{ color: 'var(--foreground)', opacity: 0.7, textDecoration: 'none', fontSize: '14px', fontWeight: 500, transition: 'opacity 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.opacity = '1'} onMouseLeave={(e) => e.currentTarget.style.opacity = '0.7'}>
+                    {lang === 'ja' ? '観点' : 'Views'}
+                </Link>
+                <Link href="/pattern/models" style={{ color: 'var(--foreground)', opacity: 0.7, textDecoration: 'none', fontSize: '14px', fontWeight: 500, transition: 'opacity 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.opacity = '1'} onMouseLeave={(e) => e.currentTarget.style.opacity = '0.7'}>
+                    {lang === 'ja' ? 'カタログ' : 'Catalog'}
+                </Link>
                 <Link href="/abc" style={{ color: 'var(--foreground)', opacity: 0.7, textDecoration: 'none', fontSize: '14px', fontWeight: 500, transition: 'opacity 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.opacity = '1'} onMouseLeave={(e) => e.currentTarget.style.opacity = '0.7'}>
-                    Activity by Contract
+                    AbC
                 </Link>
                 <Link href="/abc/gallery" style={{ color: 'var(--foreground)', opacity: 0.7, textDecoration: 'none', fontSize: '14px', fontWeight: 500, transition: 'opacity 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.opacity = '1'} onMouseLeave={(e) => e.currentTarget.style.opacity = '0.7'}>
                     {lang === 'ja' ? 'ギャラリー' : 'Gallery'}
