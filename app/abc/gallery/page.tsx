@@ -42,11 +42,11 @@ export default function GalleryPage() {
 
     return (
         <ReactFlowProvider>
-            <div style={{ minHeight: '100vh', background: '#f8faff', padding: '40px 20px' }}>
+            <div style={{ minHeight: '100vh', background: '#f8faff', padding: '100px 20px 40px' }}>
                 <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
                     <div style={{ marginBottom: '40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <div>
-                            <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#666', fontSize: '14px', textDecoration: 'none', marginBottom: '12px' }}>
+                            <Link href="/abc" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#666', fontSize: '14px', textDecoration: 'none', marginBottom: '12px' }}>
                                 <ArrowLeft size={16} /> {lang === 'ja' ? 'AbC TOPへ戻る' : 'Back to AbC TOP'}
                             </Link>
                             <h1 style={{ fontSize: '32px', fontWeight: '800', color: '#1a192b', margin: 0 }}>
@@ -56,7 +56,7 @@ export default function GalleryPage() {
                                 {lang === 'ja' ? 'AbC手法で作成された再利用可能なモデル一覧' : 'A collection of reusable models built with the AbC methodology'}
                             </p>
                         </div>
-                        <Link href="/modeler" style={{
+                        <Link href="/abc/modeler" style={{
                             padding: '12px 24px',
                             background: '#1a192b',
                             color: '#fff',

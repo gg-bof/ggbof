@@ -64,7 +64,7 @@ export default function AbCLandingPage() {
     });
 
     return (
-        <div style={{ minHeight: '100vh', background: '#fff', color: '#1a192b', paddingTop: '64px', fontFamily: 'Inter, sans-serif' }}>
+        <div style={{ minHeight: '100vh', background: '#fff', color: '#1a192b', paddingTop: '80px', fontFamily: 'Inter, sans-serif' }}>
 
 
             {/* Hero Section */}
